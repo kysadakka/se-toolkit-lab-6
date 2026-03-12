@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
@@ -83,25 +84,45 @@ def main() -> None:
     out.append(f"**Date:** {date.today().isoformat()}")
     out.append(f"**Paths scanned:** {', '.join(f'`{sp}`' for sp in search_paths)}")
     out.append("")
-    out.append("---")
-    out.append("")
 
     if not file_results:
+        out.append("---")
+        out.append("")
         out.append("No incomplete sections found.")
     else:
+        groups: dict[str, list[str]] = defaultdict(list)
         for filepath_str in sorted(file_results.keys()):
-            out.append(f"### `{filepath_str}`")
+            top = Path(filepath_str).parts[0].capitalize()
+            groups[top].append(filepath_str)
+        sorted_groups = sorted(groups.items())
+
+        out.append("<h2>Table of contents</h2>")
+        out.append("")
+        for group, files in sorted_groups:
+            out.append(f"- [{group}](#{group.lower()})")
+            for fp in files:
+                anchor = heading_anchor(f"### `{fp}`")
+                out.append(f"  - [`{fp}`](#{anchor})")
+        out.append("")
+        out.append("---")
+        out.append("")
+
+        for group, files in sorted_groups:
+            out.append(f"## {group}")
             out.append("")
-            for lnum, heading, kind, comment in file_results[filepath_str]:
-                anchor = heading_anchor(heading)
-                rel = os.path.relpath(filepath_str, report_path.parent)
-                link_target = f"{rel}#{anchor}"
-                label = f"{filepath_str}:{lnum}"
-                if kind == "empty":
-                    out.append(f"- [{label}]({link_target}) — {heading} (empty)")
-                else:
-                    out.append(f"- [{label}]({link_target}) — {heading} (TODO: {comment})")
-            out.append("")
+            for filepath_str in files:
+                out.append(f"### `{filepath_str}`")
+                out.append("")
+                for lnum, heading, kind, comment in file_results[filepath_str]:
+                    anchor = heading_anchor(heading)
+                    rel = os.path.relpath(filepath_str, report_path.parent)
+                    link_target = f"{rel}#{anchor}"
+                    label = f"{filepath_str}:{lnum}"
+                    if kind == "empty":
+                        out.append(f"- [{label}]({link_target}) — {heading} (empty)")
+                    else:
+                        out.append(f"- [{label}]({link_target}) — {heading} (TODO: {comment})")
+                out.append("")
 
     out.append("---")
     out.append("")
