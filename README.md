@@ -16,11 +16,10 @@ The lab gets updated regularly, so do [sync your fork with the upstream](https:/
 
 > "Everybody should implement an agent loop at some point. It's the hello-world of agentic engineering."
 
-You will build a CLI agent that can answer questions by reading the lab docs, connecting to your VM backend. You then will evaluate the agents against a benchmark.
+You will build a CLI agent that can answer questions by reading the lab docs and querying the backend API. You then will evaluate the agent against a benchmark.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Your VM                                                     │
 │                                                              │
 │  ┌──────────────┐     ┌──────────────────────────────────┐   │
 │  │  agent.py    │────▶│  OpenRouter API                  │   │
@@ -30,7 +29,7 @@ You will build a CLI agent that can answer questions by reading the lab docs, co
 │         │ tool calls                                         │
 │         ├──────────▶ read_file(path) ──▶ source code, wiki/  │
 │         ├──────────▶ list_files(dir)  ──▶ files and folders  │
-│         ├──────────▶ query_api(path)  ──▶ localhost:42002    │
+│         ├──────────▶ query_api(path)  ──▶ backend API        │
 │         │                                                    │
 │  ┌──────┴───────┐                                            │
 │  │  Docker      │  app (FastAPI) ─── postgres (data)         │
