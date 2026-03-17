@@ -101,9 +101,16 @@ Strategy:
         
         # If no tool calls, we're done
         if not msg.tool_calls:
+            source = "wiki/"
+            if msg.content:
+                lines = msg.content.split('\n')
+                for line in lines:
+                    if 'wiki/' in line and '.md' in line:
+                        source = line.strip()
+                        break
             result = {
                 "answer": msg.content or "No answer found",
-                "source": "wiki/",
+                "source": source,
                 "tool_calls": tool_calls_log
             }
             print(json.dumps(result))
@@ -137,9 +144,16 @@ Strategy:
             })
     
     # Max iterations reached
+    if msg.content:
+        lines = msg.content.split('\n')
+        for line in lines:
+            if 'wiki/' in line and '.md' in line:
+                source = line.strip()
+                break
+    
     result = {
         "answer": "Maximum iterations reached",
-        "source": "wiki/",
+        "source": sourse,
         "tool_calls": tool_calls_log
     }
     print(json.dumps(result))
