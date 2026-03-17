@@ -1,23 +1,27 @@
-# Task 2: Documentation Agent
+# Task 2: Documentation Agent - Implementation Plan
 
 ## Tools
-- `read_file(path)`: читает файл
-- `list_files(path)`: показывает файлы в папке
+- `read_file(path)`: read file contents
+- `list_files(path)`: list directory contents
 
-## Agentic Loop
-1. Отправить вопрос + описание инструментов в LLM
-2. Если LLM просит вызвать инструмент → вызываем, добавляем результат в историю, повторяем
-3. Если LLM даёт ответ без вызова инструментов → выводим JSON и завершаем
-4. Максимум 10 вызовов
+## Security
+- Block paths containing ".." or starting with "/"
 
-## Output
+## Agent Loop
+1. Send question + tool definitions to LLM
+2. If tool calls → execute, add results, repeat
+3. If no tool calls → output JSON with answer, source, tool_calls
+4. Max 10 iterations
+
+## Output Format
 {
-  "answer": "ответ",
+  "answer": "the answer",
   "source": "wiki/file.md",
   "tool_calls": [
-    {"tool": "read_file", "args": {"path": "wiki/file.md"}, "result": "содержимое"}
+    {"tool": "read_file", "args": {"path": "..."}, "result": "..."}
   ]
 }
 
-## Security
-- Запрещаем ".." в путях
+## Tests
+- Test 1: question requiring read_file
+- Test 2: question requiring list_files
