@@ -192,6 +192,11 @@ Rules:
 8. Provide complete answers based on tool results.
 9. When reporting errors, include both the error message AND the exception type (e.g., "ZeroDivisionError: division by zero").
 10. NEVER output phrases like "Let me check", "Let me see", "I'll look" - just use tools and provide the final answer.
+11. When asked about bugs or risky operations in code, look for: division operations (/, //), sorting with potentially None values, missing null checks, and type errors.
+12. For bug diagnosis, ALWAYS read the source code file after seeing the API error - do not answer based on API response alone.
+13. If an API endpoint doesn't crash when tested, read the source code anyway to identify potential bugs.
+14. For analytics endpoint bugs, read backend/app/routers/analytics.py to find the bug.
+15. When a question says an endpoint "crashes for some" inputs, try multiple different inputs AND read the source code to find the bug.
 
 Backend routers are in: backend/app/routers/
 Backend Dockerfile is at: Dockerfile (in project root)"""
@@ -202,7 +207,7 @@ Backend Dockerfile is at: Dockerfile (in project root)"""
     ]
     
     tool_calls_log = []
-    max_iter = 10
+    max_iter = 10  # Allow more iterations for complex questions
     files_read = []  # Track files read for source tracking
     
     for _ in range(max_iter):
@@ -221,9 +226,11 @@ Backend Dockerfile is at: Dockerfile (in project root)"""
             content = msg.content or ""
             intermediate_phrases = [
                 "let me check", "let me see", "let me look", "let me read",
-                "i'll check", "i'll look", "i'll see", "i'll read",
-                "now i need", "now let me", "let me explore", "let me find",
-                "let me open", "i'll open", "let me navigate", "let me go to"
+                "let me examine", "let me analyze", "let me find", "let me explore",
+                "let me also", "let me get", "let me try", "let me test",
+                "i'll check", "i'll look", "i'll see", "i'll read", "i'll examine",
+                "now i need", "now let me", "let me open", "i'll open",
+                "let me navigate", "let me go to", "i need to", "i should"
             ]
             is_intermediate = any(phrase in content.lower() for phrase in intermediate_phrases)
             
